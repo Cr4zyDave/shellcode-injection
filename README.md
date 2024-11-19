@@ -1,4 +1,4 @@
-# Shellcode Injection in CPP (Because WHY NOT?)
+# Shellcode Injection in CPP (Because WHY NOT)
 
 ### Why You Should Use This
 - **You’re a Nerd**:  Maybe you just like to mess with stuff and see what breaks. Either way, this code will *definitely* teach you something useful—or at the very least, it’ll give you a good laugh while you try to figure out why everything stopped working.
