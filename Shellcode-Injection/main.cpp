@@ -18,7 +18,7 @@ unsigned char shellcode[MAX_SHELLCODE_SIZE];
 #pragma region readFromFile
 
 /* This function will save the shellcode and the size of shellcode into variables if executed successfully. The functions returns TURE (0) on successfull execution. Don't expect it to execute successfully tho */
-BOOL LoadShellcodeFromFile(const char* filename) { // size_t is basically a unsigned 64bit integer
+BOOL LoadShellcodeFromFile(const char* filename) { // size_t is basically an unsigned 64bit integer
 	FILE* pFile;
 	fopen_s(&pFile, filename, "rb");
 	if (pFile == NULL) {
