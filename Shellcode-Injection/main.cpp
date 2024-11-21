@@ -49,14 +49,7 @@ BOOL LoadShellcodeFromFile(const char* filename) { // size_t is basically an uns
 //------------------------------------------------------------------------------------------------------
 
 void banner(void) {
-	printf("\n\n");
-	printf("|_   __ \\  [  |      | |  | |   |_   __ \\     .'    '.  | |  | |   |_   ||   _| \n");
-	printf("  | |__) |  | |--.   | |__| |_    | |__) |   |  .--.  | | |__| |_    | |__| |   \n");
-	printf("  |  ___/   | .-. |  |____   _|   |  __ /    | |    | | |____   _|   |  __  |   \n");
-	printf(" _| |_      | | | |      _| |_   _| |  \\ \\_  |  `--'  |     _| |_   _| |  | |_  \n");
-	printf("|_____|    [___]|__]    |_____| |____| |___|  '.____.'     |_____| |____||____| \n\n\n");
-
-	printf("DISCLAIMER: This code is for educational purposes only... because who doesn't want to learn how to print things, right? \n");
+	printf("\n\nDISCLAIMER: This code is for educational purposes only... because who doesn't want to learn how to print things, right? \n");
 	printf("If you decide to use this for any malicious activities, well... congratulations, you're officially on the wrong side of history. \n");
 	printf("But seriously, please don't. We don't need any more 'hackers' who think running random scripts makes them a legend. \n\n");
 }
